@@ -17,7 +17,7 @@ namespace Avalonia.Diagnostics
         /// <param name="dpi">Dpi quality.</param>
         public static void RenderTo(this Control source, Stream destination, double dpi = 96)
         {
-            var transform = source.CompositionVisual?.TryGetServerGlobalTransform();
+            var transform = source.CompositionVisual?.TransformMatrix;
             if (transform == null)
                 return;
 
@@ -54,7 +54,7 @@ namespace Avalonia.Diagnostics
                 using (var bitmap = new RenderTargetBitmap(pixelSize, dpiVector))
                 {
                     bitmap.Render(root);
-                    bitmap.Save(destination);
+                    bitmap.Save(destination, new PngBitmapEncoderOptions());
                 }
             }
             finally

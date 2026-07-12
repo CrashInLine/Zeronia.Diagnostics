@@ -5,13 +5,10 @@ using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.Diagnostics;
 using Avalonia.Controls.Primitives;
-using Avalonia.Data;
 using Avalonia.Diagnostics.ViewModels;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
-using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
-using Avalonia.Themes.Simple;
 using Avalonia.VisualTree;
 using Avalonia.Reactive;
 
@@ -22,7 +19,7 @@ namespace Avalonia.Diagnostics.Views
         private readonly IDisposable? _inputSubscription;
         private readonly HashSet<Popup> _frozenPopupStates;
         private AvaloniaObject? _root;
-        private PixelPoint _lastPointerPosition;
+        private PixelPoint? _lastPointerPosition;
         private HotKeyConfiguration? _hotKeys;
 
         public MainWindow()
@@ -39,7 +36,7 @@ namespace Avalonia.Diagnostics.Views
                 {
                     if (x is RawPointerEventArgs pointerEventArgs)
                     {
-                        _lastPointerPosition = ((Visual)x.Root).PointToScreen(pointerEventArgs.Position);
+                        _lastPointerPosition = (x.Root as PresentationSource)?.PointToScreen(pointerEventArgs.Position);
                     }
                     else if (x is RawKeyEventArgs keyEventArgs && keyEventArgs.Type == RawKeyEventType.KeyDown)
                     {
@@ -119,7 +116,7 @@ namespace Avalonia.Diagnostics.Views
 
         private Control? GetHoveredControl(TopLevel topLevel)
         {
-            var point = topLevel.PointToClient(_lastPointerPosition);
+            var point = topLevel.PointToClient(_lastPointerPosition ?? new PixelPoint());
 
             return (Control?)topLevel.GetVisualsAt(point, x =>
                 {

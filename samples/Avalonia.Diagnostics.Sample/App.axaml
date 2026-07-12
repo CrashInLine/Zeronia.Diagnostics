@@ -6,5 +6,5 @@
 
     <Application.Styles>
         <FluentTheme />
-    </Application.Styles>
+    </Application.Styles> 
 </Application>

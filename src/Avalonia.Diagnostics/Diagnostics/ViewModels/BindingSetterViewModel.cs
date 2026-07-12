@@ -19,7 +19,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
                     break;
                 case CompiledBindingExtension binding:
-                    Path = binding.Path.ToString();
+                    Path = binding.Path?.ToString() ?? string.Empty;
                     Tint = Brushes.DarkGreen;
                     ValueTypeTooltip = "Compiled Binding";
 

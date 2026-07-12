@@ -19,7 +19,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private readonly TreePageViewModel _visualTree;
         private readonly EventsPageViewModel _events;
         private readonly HotKeyPageViewModel _hotKeys;
-        private readonly IDisposable _pointerOverSubscription;
+        private readonly IDisposable? _pointerOverSubscription;
         private ViewModelBase? _content;
         private int _selectedTab;
         private string? _focusedControl;
@@ -50,9 +50,9 @@ namespace Avalonia.Diagnostics.ViewModels
             SelectedTab = 0;
             if (root is TopLevel topLevel)
             {
-                _pointerOverRoot = topLevel;
-                _pointerOverSubscription = topLevel.GetObservable(TopLevel.PointerOverElementProperty)
-                    .Subscribe(x => PointerOverElement = x);
+                _pointerOverRoot = topLevel.InputRoot;
+                // _pointerOverSubscription = topLevel.InputRoot.PointerOverElement.
+                //     .Subscribe(x => PointerOverElement = x);
 
             }
             else
@@ -63,7 +63,7 @@ namespace Avalonia.Diagnostics.ViewModels
                             if (e is Input.Raw.RawPointerEventArgs pointerEventArgs)
                             {
                                 PointerOverRoot = pointerEventArgs.Root;
-                                PointerOverElement = pointerEventArgs.Root.InputHitTest(pointerEventArgs.Position);
+                                PointerOverElement = pointerEventArgs.Root.RootElement.InputHitTest(pointerEventArgs.Position);
                             }
                         });
             }
@@ -260,7 +260,7 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             if (KeyboardDevice.Instance is not null)
                 KeyboardDevice.Instance.PropertyChanged -= KeyboardPropertyChanged;
-            _pointerOverSubscription.Dispose();
+            _pointerOverSubscription?.Dispose();
             _logicalTree.Dispose();
             _visualTree.Dispose();
             _currentFocusHighlightAdorner?.Dispose();

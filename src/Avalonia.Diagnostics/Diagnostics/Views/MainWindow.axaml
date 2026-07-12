@@ -3,6 +3,7 @@
         xmlns:views="clr-namespace:Avalonia.Diagnostics.Views;assembly=Avalonia.Diagnostics"
         xmlns:viewModels="clr-namespace:Avalonia.Diagnostics.ViewModels;assembly=Avalonia.Diagnostics"
         xmlns:diagnostics="clr-namespace:Avalonia.Diagnostics;assembly=Avalonia.Diagnostics"
+        xmlns:semi="https://irihi.tech/semi"
         Title="Avalonia DevTools"
         x:Class="Avalonia.Diagnostics.Views.MainWindow"
         x:DataType="viewModels:MainViewModel">
@@ -11,12 +12,12 @@
   </Window.DataTemplates>
 
   <Window.Styles>
-    <SimpleTheme />
-    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml"/>
-    <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/ThicknessEditor.axaml" />
-    <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/FilterTextBox.axaml" />
-    <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/BrushEditor.axaml" />
-    <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Simple/Simple.xaml" />
+      <SimpleTheme />
+      <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml"/>
+      <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/ThicknessEditor.axaml" />
+      <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/FilterTextBox.axaml" />
+      <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/BrushEditor.axaml" />
+      <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Simple/Simple.xaml" />
   </Window.Styles>
   <views:MainView/>
 </Window>
