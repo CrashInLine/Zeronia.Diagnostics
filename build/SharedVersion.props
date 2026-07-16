@@ -4,16 +4,14 @@
   <PropertyGroup>
     <Product>Avalonia</Product>
     <Version>12.1.0$(CIVersionSuffix)</Version>
-    <Authors>Avalonia Team</Authors>
     <Copyright>Copyright 2013-$([System.DateTime]::Now.ToString(`yyyy`)) &#169; The AvaloniaUI Project</Copyright>
     <PackageProjectUrl>https://avaloniaui.net/?utm_source=nuget&amp;utm_medium=referral&amp;utm_content=project_homepage_link</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/AvaloniaUI/Avalonia.Controls.DataGrid</RepositoryUrl>
+    <RepositoryUrl>https://github.com/CrashInLine/Zeronia.Diagnostics.git</RepositoryUrl>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Icon.png</PackageIcon>
     <PackageDescription>Avalonia is a cross-platform UI framework for .NET providing a flexible styling system and supporting a wide range of Operating Systems such as Windows, Linux, macOS and with experimental support for Android, iOS and WebAssembly.</PackageDescription>
     <PackageTags>avalonia;avaloniaui;mvvm;rx;reactive extensions;android;ios;mac;forms;wpf;net;netstandard;net461;uwp;xamarin</PackageTags>
-    <PackageReleaseNotes>https://github.com/AvaloniaUI/Avalonia.Controls.DataGrid/releases</PackageReleaseNotes>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)/avalonia.snk</AssemblyOriginatorKeyFile>

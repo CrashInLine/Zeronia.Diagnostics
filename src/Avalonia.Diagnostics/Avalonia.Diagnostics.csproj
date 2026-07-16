@@ -5,6 +5,7 @@
     <RootNamespace>Avalonia</RootNamespace>
     <LangVersion>default</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Zeronia.Diagnostics</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
