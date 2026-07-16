@@ -17,10 +17,13 @@ namespace Avalonia.Diagnostics
 
         public static IDisposable Attach(TopLevel root, KeyGesture gesture)
         {
-            return Attach(root, new DevToolsOptions()
-            {
-                Gesture = gesture,
-            });
+            return Attach(
+                root,
+                new DevToolsOptions()
+                {
+                    Gesture = gesture,
+                }
+            );
         }
 
         public static IDisposable Attach(TopLevel root, DevToolsOptions options)
@@ -36,20 +39,19 @@ namespace Avalonia.Diagnostics
             return (root ?? throw new ArgumentNullException(nameof(root))).AddDisposableHandler(
                 InputElement.KeyDownEvent,
                 PreviewKeyDown,
-                RoutingStrategies.Tunnel);
+                RoutingStrategies.Tunnel
+            );
         }
 
         public static IDisposable Open(TopLevel root, DevToolsOptions options) =>
-             Open(new SingleViewTopLevelGroup(root), options, root as Window, null);
+            Open(new SingleViewTopLevelGroup(root), options, root as Window, null);
 
         internal static IDisposable Open(IDevToolsTopLevelGroup group, DevToolsOptions options) =>
             Open(group, options, null, null);
 
         internal static IDisposable Attach(Application application, DevToolsOptions options)
         {
-            var openedDisposable = new SerialDisposableValue();
             var result = new CompositeDisposable(2);
-            result.Add(openedDisposable);
 
             // Skip if call on Design Mode
             if (!Design.IsDesignMode)
@@ -59,40 +61,54 @@ namespace Avalonia.Diagnostics
 
                 if (lifeTime is null)
                 {
-                    throw new ArgumentNullException(nameof(application), "DevTools can only attach to applications that support IClassicDesktopStyleApplicationLifetime.");
+                    throw new ArgumentNullException(
+                        nameof(application),
+                        "DevTools can only attach to applications that support IClassicDesktopStyleApplicationLifetime."
+                    );
                 }
 
                 if (application.InputManager is not null)
                 {
-                    result.Add(application.InputManager.PreProcess.Subscribe(e =>
-                    {
-                        var owner = lifeTime.MainWindow;
+                    result.Add(
+                        application.InputManager.PreProcess.Subscribe(
+                            e =>
+                            {
+                                var owner = lifeTime.MainWindow;
 
-                        if (e is RawKeyEventArgs keyEventArgs
-                            && keyEventArgs.Type == RawKeyEventType.KeyUp
-                            && options.Gesture.Matches(keyEventArgs))
-                        {
-                            openedDisposable.Disposable =
-                                Open(new ClassicDesktopStyleApplicationLifetimeTopLevelGroup(lifeTime), options,
-                                    owner, application);
-                            e.Handled = true;
-                        }
-                    }));
+                                if (e is RawKeyEventArgs { Type: RawKeyEventType.KeyUp } keyEventArgs && options.Gesture.Matches(keyEventArgs))
+                                {
+                                    result.Add(
+                                        Open(
+                                            new ClassicDesktopStyleApplicationLifetimeTopLevelGroup(lifeTime),
+                                            options,
+                                            owner,
+                                            application
+                                        )
+                                    );
+                                    e.Handled = true;
+                                }
+                            }
+                        )
+                    );
                 }
             }
             return result;
         }
 
-        private static IDisposable Open(IDevToolsTopLevelGroup topLevelGroup, DevToolsOptions options,
-            Window? owner, Application? app)
+        private static IDisposable Open(
+            IDevToolsTopLevelGroup topLevelGroup,
+            DevToolsOptions options,
+            Window? owner,
+            Application? app
+        )
         {
             var focusedControl = owner?.FocusManager?.GetFocusedElement() as Control;
             AvaloniaObject root = topLevelGroup switch
-            {
-                ClassicDesktopStyleApplicationLifetimeTopLevelGroup gr => new Controls.Application(gr, app ?? Application.Current!),
-                SingleViewTopLevelGroup gr => gr.Items.First(),
-                _ => new Controls.TopLevelGroup(topLevelGroup)
-            };
+                                  {
+                                      ClassicDesktopStyleApplicationLifetimeTopLevelGroup gr => new Controls.Application(gr, app ?? Application.Current!),
+                                      SingleViewTopLevelGroup gr => gr.Items.First(),
+                                      _ => new Controls.TopLevelGroup(topLevelGroup)
+                                  };
 
             // If single static toplevel is already visible in another devtools window, focus it.
             if (s_open.TryGetValue(topLevelGroup, out var mainWindow))

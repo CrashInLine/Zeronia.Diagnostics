@@ -106,8 +106,10 @@ namespace Avalonia.Diagnostics.Views
 
                 cv.Bind(
                         ColorView.ColorProperty,
-                        new Binding(nameof(Property.Value), BindingMode.TwoWay)
+                        new Binding
                         {
+                            Path = nameof(Property.Value),
+                            Mode = BindingMode.TwoWay,
                             Source = Property,
                             Converter = Color2Brush
                         })
@@ -203,7 +205,7 @@ namespace Avalonia.Diagnostics.Views
                 new TextToValueConverter(),
                 t =>
                 {
-                    t.Watermark = "(null)";
+                    t.PlaceholderText = "(null)";
                 },
                 readonlyProperty: TextBox.IsReadOnlyProperty);
 
@@ -244,8 +246,10 @@ namespace Avalonia.Diagnostics.Views
                 init?.Invoke(control);
 
                 control.Bind(valueProperty,
-                    new Binding(nameof(Property.Value), bindingMode)
+                    new Binding
                     {
+                        Path = nameof(Property.Value),
+                        Mode =  bindingMode,
                         Source = Property,
                         Converter = converter ?? new ValueConverter(),
                         ConverterParameter = propertyType

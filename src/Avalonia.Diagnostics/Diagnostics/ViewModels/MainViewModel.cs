@@ -19,7 +19,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private readonly TreePageViewModel _visualTree;
         private readonly EventsPageViewModel _events;
         private readonly HotKeyPageViewModel _hotKeys;
-        private readonly IDisposable _pointerOverSubscription;
+        private readonly IDisposable? _pointerOverSubscription;
         private ViewModelBase? _content;
         private int _selectedTab;
         private string? _focusedControl;
@@ -48,25 +48,18 @@ namespace Avalonia.Diagnostics.ViewModels
             if (KeyboardDevice.Instance is not null)
                 KeyboardDevice.Instance.PropertyChanged += KeyboardPropertyChanged;
             SelectedTab = 0;
-            if (root is TopLevel topLevel)
-            {
-                _pointerOverRoot = topLevel;
-                _pointerOverSubscription = topLevel.GetObservable(TopLevel.PointerOverElementProperty)
-                    .Subscribe(x => PointerOverElement = x);
-
-            }
-            else
-            {
-                _pointerOverSubscription = InputManager.Instance!.PreProcess
-                    .Subscribe(e =>
+            _pointerOverSubscription = InputManager.Instance!.PreProcess
+                .Subscribe(
+                    e =>
+                    {
+                        if (e is Input.Raw.RawPointerEventArgs pointerEventArgs)
                         {
-                            if (e is Input.Raw.RawPointerEventArgs pointerEventArgs)
-                            {
-                                PointerOverRoot = pointerEventArgs.Root;
-                                PointerOverElement = pointerEventArgs.Root.InputHitTest(pointerEventArgs.Position);
-                            }
-                        });
-            }
+                            PointerOverRoot = pointerEventArgs.Root;
+                            // PointerOverElement = pointerEventArgs.Root.RootElement.InputHitTest(pointerEventArgs.Position);
+                            PointerOverElement = pointerEventArgs.InputHitTestResult.element;
+                        }
+                    }
+                );
         }
 
         public bool FreezePopups
@@ -86,17 +79,20 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private IRenderer? TryGetRenderer()
             => _root switch
-            {
-                TopLevel topLevel => topLevel.Renderer,
-                Controls.Application app => app.RendererRoot,
-                _ => null
-            };
+               {
+                   TopLevel topLevel => topLevel.Renderer,
+                   Controls.Application app => app.RendererRoot,
+                   _ => null
+               };
 
         private bool GetDebugOverlay(RendererDebugOverlays overlay)
             => ((TryGetRenderer()?.Diagnostics.DebugOverlays ?? RendererDebugOverlays.None) & overlay) != 0;
 
-        private void SetDebugOverlay(RendererDebugOverlays overlay, bool enable,
-            [CallerMemberName] string? propertyName = null)
+        private void SetDebugOverlay(
+            RendererDebugOverlays overlay,
+            bool enable,
+            [CallerMemberName] string? propertyName = null
+        )
         {
             if (TryGetRenderer() is not { } renderer)
             {
@@ -173,7 +169,8 @@ namespace Avalonia.Diagnostics.ViewModels
                             }
                             catch { }
                         },
-                        TimeSpan.FromMilliseconds(0));
+                        TimeSpan.FromMilliseconds(0)
+                    );
                 }
 
                 RaiseAndSetIfChanged(ref _content, value);
@@ -260,7 +257,7 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             if (KeyboardDevice.Instance is not null)
                 KeyboardDevice.Instance.PropertyChanged -= KeyboardPropertyChanged;
-            _pointerOverSubscription.Dispose();
+            _pointerOverSubscription?.Dispose();
             _logicalTree.Dispose();
             _visualTree.Dispose();
             _currentFocusHighlightAdorner?.Dispose();
@@ -278,7 +275,7 @@ namespace Avalonia.Diagnostics.ViewModels
             if (FocusHighlighter is IBrush brush
                 && element is InputElement input
                 && !input.DoesBelongToDevTool()
-                )
+               )
             {
                 _currentFocusHighlightAdorner = Controls.ControlHighlightAdorner.Add(input, brush);
             }
@@ -313,16 +310,16 @@ namespace Avalonia.Diagnostics.ViewModels
         public bool CanShot(object? parameter)
         {
             return Content is TreePageViewModel tree
-                && tree.SelectedNode != null
-                && tree.SelectedNode.Visual is Visual visual
-                && visual.VisualRoot != null;
+                   && tree.SelectedNode != null
+                   && tree.SelectedNode.Visual is Visual visual
+                   && visual.VisualRoot != null;
         }
 
         public async void Shot(object? parameter)
         {
             if ((Content as TreePageViewModel)?.SelectedNode?.Visual is Control control
                 && _screenshotHandler is { }
-                )
+               )
             {
                 try
                 {

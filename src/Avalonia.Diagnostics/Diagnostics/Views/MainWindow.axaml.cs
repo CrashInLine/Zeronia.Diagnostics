@@ -5,24 +5,22 @@ using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.Diagnostics;
 using Avalonia.Controls.Primitives;
-using Avalonia.Data;
 using Avalonia.Diagnostics.ViewModels;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
-using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
-using Avalonia.Themes.Simple;
 using Avalonia.VisualTree;
 using Avalonia.Reactive;
+using Ursa.Controls;
 
 namespace Avalonia.Diagnostics.Views
 {
-    internal partial class MainWindow : Window, IStyleHost
+    internal partial class MainWindow : UrsaWindow, IStyleHost
     {
         private readonly IDisposable? _inputSubscription;
         private readonly HashSet<Popup> _frozenPopupStates;
         private AvaloniaObject? _root;
-        private PixelPoint _lastPointerPosition;
+        private PixelPoint? _lastPointerPosition;
         private HotKeyConfiguration? _hotKeys;
 
         public MainWindow()
@@ -35,18 +33,20 @@ namespace Avalonia.Diagnostics.Views
                 Theme = windowTheme;
 
             _inputSubscription = InputManager.Instance?.Process
-                .Subscribe(x =>
-                {
-                    if (x is RawPointerEventArgs pointerEventArgs)
+                .Subscribe(
+                    x =>
                     {
-                        _lastPointerPosition = ((Visual)x.Root).PointToScreen(pointerEventArgs.Position);
+                        if (x is RawPointerEventArgs pointerEventArgs)
+                        {
+                            _lastPointerPosition = (x.Root as PresentationSource)?.PointToScreen(pointerEventArgs.Position);
+                        }
+                        else if (x is RawKeyEventArgs { Type: RawKeyEventType.KeyDown } keyEventArgs)
+                        {
+                            RawKeyDown(keyEventArgs);
+                        }
                     }
-                    else if (x is RawKeyEventArgs keyEventArgs && keyEventArgs.Type == RawKeyEventType.KeyDown)
-                    {
-                        RawKeyDown(keyEventArgs);
-                    }
-                });
-            
+                );
+
             _frozenPopupStates = new HashSet<Popup>();
 
             EventHandler? lh = default;
@@ -81,7 +81,7 @@ namespace Avalonia.Diagnostics.Views
 
                     _root = value;
 
-                    if (_root is  ICloseable newClosable)
+                    if (_root is ICloseable newClosable)
                     {
                         newClosable.Closed += RootClosed;
                         DataContext = new MainViewModel(_root);
@@ -119,17 +119,20 @@ namespace Avalonia.Diagnostics.Views
 
         private Control? GetHoveredControl(TopLevel topLevel)
         {
-            var point = topLevel.PointToClient(_lastPointerPosition);
+            var point = topLevel.PointToClient(_lastPointerPosition ?? new PixelPoint());
 
-            return (Control?)topLevel.GetVisualsAt(point, x =>
-                {
-                    if (x is AdornerLayer || !x.IsVisible)
+            return (Control?)topLevel.GetVisualsAt(
+                    point,
+                    x =>
                     {
-                        return false;
-                    }
+                        if (x is AdornerLayer || !x.IsVisible)
+                        {
+                            return false;
+                        }
 
-                    return !(x is IInputElement ie) || ie.IsHitTestVisible;
-                })
+                        return !(x is IInputElement ie) || ie.IsHitTestVisible;
+                    }
+                )
                 .FirstOrDefault();
         }
 
@@ -139,8 +142,7 @@ namespace Avalonia.Diagnostics.Views
 
             void ProcessProperty<T>(Control control, AvaloniaProperty<T> property)
             {
-                if (control.GetValue(property) is IPopupHostProvider popupProvider
-                    && popupProvider.PopupHost is PopupRoot popupRoot)
+                if (control.GetValue(property) is IPopupHostProvider { PopupHost: PopupRoot popupRoot })
                 {
                     popupRoots.Add(popupRoot);
                 }
@@ -165,14 +167,15 @@ namespace Avalonia.Diagnostics.Views
 
         private void RawKeyDown(RawKeyEventArgs e)
         {
-            if (_hotKeys is null ||
-                DataContext is not MainViewModel vm ||
-                vm.PointerOverRoot is not TopLevel root)
+            if (_hotKeys is null || DataContext is not MainViewModel vm)
             {
                 return;
             }
 
-            if (root is PopupRoot pr && pr.ParentTopLevel != null)
+            var root = (vm.PointerOverRoot as PresentationSource)?.RootVisual.GetSelfAndVisualDescendants().OfType<TopLevel>().FirstOrDefault();
+            if (root is null) return;
+
+            if (root is PopupRoot pr)
             {
                 root = pr.ParentTopLevel;
             }
@@ -210,12 +213,12 @@ namespace Avalonia.Diagnostics.Views
             static KeyModifiers MergeModifiers(Key key, KeyModifiers modifiers)
             {
                 return key switch
-                {
-                    Key.LeftCtrl or Key.RightCtrl => modifiers | KeyModifiers.Control,
-                    Key.LeftShift or Key.RightShift => modifiers | KeyModifiers.Shift,
-                    Key.LeftAlt or Key.RightAlt => modifiers | KeyModifiers.Alt,
-                    _ => modifiers
-                };
+                       {
+                           Key.LeftCtrl or Key.RightCtrl => modifiers | KeyModifiers.Control,
+                           Key.LeftShift or Key.RightShift => modifiers | KeyModifiers.Shift,
+                           Key.LeftAlt or Key.RightAlt => modifiers | KeyModifiers.Alt,
+                           _ => modifiers
+                       };
             }
         }
 
@@ -286,7 +289,7 @@ namespace Avalonia.Diagnostics.Views
                 e.Cancel = true;
             }
         }
-        
+
         private void RootClosed(object? sender, EventArgs e) => Close();
 
         public void SetOptions(DevToolsOptions options)
