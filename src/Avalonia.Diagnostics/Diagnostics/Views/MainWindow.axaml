@@ -14,6 +14,8 @@
 
   <u:UrsaWindow.Styles>
       <SimpleTheme />
+      <semi:SemiTheme />
+      <semi:UrsaSemiTheme />
       <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml"/>
       <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/ThicknessEditor.axaml" />
       <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/FilterTextBox.axaml" />
