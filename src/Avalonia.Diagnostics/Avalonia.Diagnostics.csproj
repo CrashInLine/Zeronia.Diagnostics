@@ -12,6 +12,8 @@
     <PackageReference Include="Avalonia.Themes.Simple" />
     <PackageReference Include="Avalonia.Controls.ColorPicker" />
     <PackageReference Include="Avalonia.Controls.DataGrid" />
+    <PackageReference Include="Irihi.Ursa.Themes.Semi" />
+    <PackageReference Include="Semi.Avalonia" />
   </ItemGroup>
 
   <Import Project="../../build/SharedVersion.props" />

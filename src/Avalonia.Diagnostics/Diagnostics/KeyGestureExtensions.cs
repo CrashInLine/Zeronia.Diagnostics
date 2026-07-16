@@ -3,7 +3,7 @@ using Avalonia.Input.Raw;
 
 namespace Avalonia.Diagnostics
 {
-    internal static class KeyGestureExtesions
+    internal static class KeyGestureExtensions
     {
         public static bool Matches(this KeyGesture gesture, RawKeyEventArgs keyEvent) =>
             (KeyModifiers)(keyEvent.Modifiers & RawInputModifiers.KeyboardMask) == gesture.KeyModifiers &&

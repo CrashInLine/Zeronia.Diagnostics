@@ -75,9 +75,7 @@ namespace Avalonia.Diagnostics
                             {
                                 var owner = lifeTime.MainWindow;
 
-                                if (e is RawKeyEventArgs keyEventArgs
-                                    && keyEventArgs.Type == RawKeyEventType.KeyUp
-                                    && options.Gesture.Matches(keyEventArgs))
+                                if (e is RawKeyEventArgs { Type: RawKeyEventType.KeyUp } keyEventArgs && options.Gesture.Matches(keyEventArgs))
                                 {
                                     result.Add(
                                         Open(
