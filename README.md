@@ -2,55 +2,66 @@
 
 # Zeronia.Diagnostics
 
-简体中文说明：
+中文（简体）
 
-Zeronia.Diagnostics 是 Avalonia 诊断工具的历史归档，记录了从 Avalonia 11 时代的内嵌 DevTools 到 Avalonia 12+ 推荐迁移方案的说明。本仓库用于参考旧版实现和迁移步骤，不再用于发布新功能。
+Zeronia.Diagnostics 是一个轻量的兼容包，用于在 Avalonia v12 中继续使用旧版 Avalonia.Diagnostics 的功能。此包并非对原项目的完整复刻，而是提供最小的迁移/兼容层，方便在 Avalonia 12 环境中快速启用调试窗口（DevTools）。如果需要在 Avalonia v12 中使用 Avalonia.Diagnostics 的体验，可以使用本包。
 
-主要内容
-- 说明如何从旧的 `Avalonia.Diagnostics` 迁移到新版诊断支持（AvaloniaUI.DiagnosticsSupport）和独立的 Developer Tools。
-- 提供在应用中启用开发者工具的示例代码。
-
-快速迁移指南
-
-1. 从项目移除旧包（如存在）：
+快速安装（NuGet）
 
 ```powershell
-dotnet remove package Avalonia.Diagnostics
+dotnet add package Zeronia.Diagnostics
 ```
 
-2. 安装新的诊断支持包（运行时依赖）：
-
-```powershell
-dotnet add package AvaloniaUI.DiagnosticsSupport
-```
-
-3. 安装独立的 Developer Tools（可选，全局工具）：
-
-```powershell
-dotnet tool install --global AvaloniaUI.DeveloperTools
-```
-
-4. 在应用中启用（通常在 DEBUG 下）：
+在应用中启用（示例）：
 
 ```csharp
 public override void Initialize()
 {
     AvaloniaXamlLoader.Load(this);
 #if DEBUG
-    this.AttachDeveloperTools();
+    this.AttachDeveloperTools(); // 保留与旧版相同的调用方式
 #endif
 }
 ```
 
-5. 启动应用并按 F12 打开 Developer Tools（或运行已安装的独立工具）。
+说明与建议
+- 本包旨在简化从 Avalonia.Diagnostics 到 Avalonia v12 的迁移，并在大多数常见场景下提供兼容性。
+- 对于最新、完整的诊断体验，仍推荐使用官方的 Runtime 支持包和独立 Developer Tools：
+  - AvaloniaUI.DiagnosticsSupport（运行时支持）
+  - AvaloniaUI.DeveloperTools（独立工具）
+- 若遇到兼容性问题或需要特定功能，请在仓库中创建 issue 说明你的 Avalonia 版本和使用场景。
 
-更多信息
-- 官方文档：https://docs.avaloniaui.net/tools/developer-tools/installation
+License: MIT（详见 LICENSE 文件）
 
-贡献与历史
-- 本仓库保留旧版实现以供参考。若需迁移帮助或提交改进建议，请打开 issue 或发起 PR。
+---
 
-许可证
-- 本项目遵循 MIT 许可证。详情见 LICENSE 文件。
+English
 
-如需针对特定版本或迁移场景的帮助，请在仓库中发起 issue，描述你的 Avalonia 版本和使用场景。
+Zeronia.Diagnostics is a lightweight compatibility package that lets you continue using the legacy Avalonia.Diagnostics experience on Avalonia v12. It provides a minimal migration/compat layer so you can quickly enable the in-process DevTools window in a v12 environment. This package is intended for users who want to keep using Avalonia.Diagnostics behavior on v12.
+
+Quick install (NuGet)
+
+```powershell
+dotnet add package Zeronia.Diagnostics
+```
+
+Enable in your application (example):
+
+```csharp
+public override void Initialize()
+{
+    AvaloniaXamlLoader.Load(this);
+#if DEBUG
+    this.AttachDeveloperTools(); // same call pattern as the legacy package
+#endif
+}
+```
+
+Notes & recommendations
+- This package aims to ease migration and provide compatibility for common scenarios; it is not a full reimplementation of the original project.
+- For the most complete and up-to-date diagnostics experience, prefer the official packages:
+  - AvaloniaUI.DiagnosticsSupport (runtime support)
+  - AvaloniaUI.DeveloperTools (standalone tool)
+- If you encounter compatibility issues or need specific features, please open an issue with your Avalonia version and usage details.
+
+License: MIT (see LICENSE)
