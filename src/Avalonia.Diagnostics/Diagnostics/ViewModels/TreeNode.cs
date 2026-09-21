@@ -4,6 +4,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.LogicalTree;
+using Avalonia.Markup.Xaml.Diagnostics;
 using Avalonia.Media;
 using Avalonia.Reactive;
 
@@ -13,11 +14,12 @@ namespace Avalonia.Diagnostics.ViewModels
     {
         private readonly IDisposable? _classesSubscription;
         private string _classes;
-        private bool _isExpanded;
+        private XamlSourceInfo? _sourceInfo;
 
         protected TreeNode(AvaloniaObject avaloniaObject, TreeNode? parent, string? customTypeName = null)
         {
             _classes = string.Empty;
+            _sourceInfo = XamlSourceInfo.GetXamlSourceInfo(avaloniaObject);
             Parent = parent;
             Type = customTypeName ?? avaloniaObject.GetType().Name;
             Visual = avaloniaObject;
@@ -31,49 +33,37 @@ namespace Avalonia.Diagnostics.ViewModels
                     .StartWith(null)
                     .Subscribe(_ =>
                     {
-                        if (classes.Count > 0)
-                        {
-                            Classes = $"({string.Join(" ", classes)})";
-                        }
-                        else
-                        {
-                            Classes = string.Empty;
-                        }
+                        Classes = classes.Count > 0 ? $"({string.Join(" ", classes)})" : string.Empty;
                     });
             }
         }
 
-        private bool IsRoot => Visual is TopLevel ||
-                               Visual is ContextMenu ||
-                               Visual is IPopupHost;
+        private bool IsRoot => Visual is TopLevel or ContextMenu or IPopupHost;
 
         public FontWeight FontWeight { get; }
 
-        public abstract TreeNodeCollection Children
-        {
-            get;
-        }
+        public abstract TreeNodeCollection Children { get; }
 
         public string Classes
         {
-            get { return _classes; }
-            private set { RaiseAndSetIfChanged(ref _classes, value); }
+            get => _classes;
+            private set => RaiseAndSetIfChanged(ref _classes, value);
         }
 
-        public string? ElementName
+        public XamlSourceInfo? SourceInfo
         {
-            get;
+            get => _sourceInfo;
+            private set => RaiseAndSetIfChanged(ref _sourceInfo, value);
         }
 
-        public AvaloniaObject Visual
-        {
-            get;
-        }
+        public string? ElementName { get; }
+
+        public AvaloniaObject Visual { get; }
 
         public bool IsExpanded
         {
-            get { return _isExpanded; }
-            set { RaiseAndSetIfChanged(ref _isExpanded, value); }
+            get;
+            set => RaiseAndSetIfChanged(ref field, value);
         }
 
         public TreeNode? Parent
@@ -91,6 +81,13 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             _classesSubscription?.Dispose();
             Children.Dispose();
+        }
+
+        public void NavigateToXamlSource()
+        {
+            Console.WriteLine($"source info :{_sourceInfo}");
+            if (_sourceInfo is null) return;
+            RiderXamlHelper.NavigateToXamlSource(_sourceInfo.LineNumber, _sourceInfo.LinePosition, _sourceInfo.SourceUri?.LocalPath);
         }
     }
 }

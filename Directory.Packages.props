@@ -10,6 +10,8 @@
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.1.0" />
     <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="12.1.0" />
     <PackageVersion Include="Irihi.Ursa.Themes.Semi" Version="2.1.0" />
+    <PackageVersion Include="JetBrains.Rider.PathLocator" Version="1.0.12" />
+    <PackageVersion Include="Material.Icons.Avalonia" Version="3.0.2" />
     <PackageVersion Include="Semi.Avalonia" Version="12.1.0" />
     <PackageVersion Include="Semi.Avalonia.ColorPicker" Version="12.1.0" />
     <PackageVersion Include="Semi.Avalonia.DataGrid" Version="12.1.0" />

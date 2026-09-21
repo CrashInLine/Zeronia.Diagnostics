@@ -6,6 +6,7 @@
     <LangVersion>default</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Zeronia.Diagnostics</PackageId>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,8 @@
     <PackageReference Include="Avalonia.Controls.ColorPicker" />
     <PackageReference Include="Avalonia.Controls.DataGrid" />
     <PackageReference Include="Irihi.Ursa.Themes.Semi" />
+    <PackageReference Include="JetBrains.Rider.PathLocator" />
+    <PackageReference Include="Material.Icons.Avalonia" />
     <PackageReference Include="Semi.Avalonia" />
   </ItemGroup>
 
